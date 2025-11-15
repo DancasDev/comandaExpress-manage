@@ -54,6 +54,23 @@ export const rulesStore  = defineStore('rules', () => {
     }
 
     /**
+     * @description Validar campos donde se requiran una url
+     * 
+     * @param {String} value - Valor a analozar
+     * 
+     * @return {Boolean|String} 
+     */
+    function url(value, pattern) {
+        let response = true
+        pattern ??= /^(https|http):\/\/[-a-z0-9+&@#\/%?=~_|!:,.;]*$/i;
+        if (typeof value == 'string' && value.length > 0 && !pattern.test(value)) {
+            response = 'El campo debe ser una url válida';
+        }
+        return response
+    }
+
+
+    /**
      * @description Validar si la logitud de un string esta entre un rango
      *
      * @param {String} value - String a validar
@@ -224,7 +241,7 @@ export const rulesStore  = defineStore('rules', () => {
         // Getters
 
         // Actions
-        required, email, phone, stringRange, stringCompare, stringOnly, numberRange, numberOnly, dateCompare
+        required, email, phone, url, stringRange, stringCompare, stringOnly, numberRange, numberOnly, dateCompare
     };
 });
 

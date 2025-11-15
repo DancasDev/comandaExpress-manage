@@ -1,24 +1,13 @@
 import { ref, computed, watch, nextTick, onMounted, onBeforeMount } from 'vue';
-import appStore from 'store/app.js';
 
-import tenantConfig from 'sections/tenant-config/index.js';
-
-/* Componente */
 export const component = {
-    components: {
-        'tenant-config': tenantConfig
-    },
+    components: {},
     emits: [],
     props: {},
     template: /*html*/`
-        <v-container fluid>
-            <v-row>
-                <tenant-config></tenant-config>
-            </v-row>
-        </v-container>
+        <div>section</div>
     `,
     setup(props, { emit }) {
-        let app = appStore();
 
         /* Data */
 
@@ -29,12 +18,7 @@ export const component = {
         /* Methods */
         
         /* Ciclo de vida */
-        onMounted(() => {
-            nextTick(() => {
-                app.setStatus('running');
-            });
-        });
-        
+
         /* Exponer estado */
         return {
             // Data
