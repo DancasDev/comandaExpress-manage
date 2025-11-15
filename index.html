@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es" style="overflow-y: hidden !important;">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=roboto:400,500,700" />
+    <!--link rel="icon" type="image/x-icon" href="medias/images/favicon/favicon.ico"-->
+    <link href="css/materialdesignicons/materialdesignicons.min.css" rel="stylesheet">
+    <link href="css/vuetify/vuetify.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <title>ComandaExpress</title>
+</head>
+<body>
+    <div id="app">
+        <v-app app>
+            <overlay-loader></overlay-loader> 
+            <v-main scrollable app>
+                <v-sheet id="sheetScrolling" color="transparent" class="overflow-y-auto">
+                    <router-view></router-view>
+                </v-sheet>
+            </v-main>
+            <snackbar></snackbar>
+        </v-app>
+    </div>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "vue": "./js/vue/vue.esm-browser.js",
+                "vue-demi": "./js/vue-demi/index.mjs",
+                "@vue/devtools-api": "./js/vue/devtools-api/index.js",
+                "vuetify": "./js/vuetify/vuetify.esm.js",
+                "vue-router": "./js/vue-router/vue-router.esm-browser.js",
+                "axios": "./js/axios/axios.min.js",
+                "pinia": "./js/pinia/pinia.esm-browser.js",
+                "views/": "./views/",
+                "sections/": "./sections/",
+                "components/": "./components/",
+                "settings/": "./settings/",
+                "store/": "./settings/pinia/store/",
+                "request/": "./settings/axios/",
+                "main/": "./js/main/"
+            }
+        }
+    </script>
+    <script type="module" src="settings/index.js"></script>
+</body>
