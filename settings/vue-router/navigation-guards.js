@@ -23,7 +23,7 @@ export function init() {
                 }, 350);
             });
         }
-
+        
         if(!app.hasUser && app.hasSessionToken()) {
             await app.getUserDataFromServer().catch(e => null);
         }

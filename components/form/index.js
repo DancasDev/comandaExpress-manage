@@ -180,39 +180,41 @@ export const component = {
         /**
          * Realizar envio de la data
          * 
-         * info: El estado de carga se maneja en skeleton.js
+         * info: El estado de "loadingValue" se maneja en skeleton.js
          * 
          * @return {promise}
          */
         function callback() {
-            let data = {};
+            let result = {affected: true, message: null, data: {}};
             
             if (props.type == 'create' || props.type == 'read') {
                 fieldKeys.value.forEach(field => {
-                    data[field] = recordData.value[field].after;
+                    result.data[field] = recordData.value[field].after;
                 });
             }
             else {
                 fieldKeys.value.forEach(field => {
                     if (props.returnAll || recordData.value[field].after !== recordData.value[field].before) {
-                        data[field] = recordData.value[field].after;
+                        result.data[field] = recordData.value[field].after;
                     }
                 });
                 
-                if (!Object.keys(data).length) {
+                if (!Object.keys(result.data).length) {
                     let text = 'No se detectaron cambios para aplicar.';
                     loadingValue.value = false;
                     app.setSnackbar({text, template: '<info>'});
-                    return Promise.resolve({_affected: false, _text});
+
+                    result.affected = false;
+                    result.message = text;
                 }
             }
 
             
             // Realizar solicitud
-            return props.callback(data).then(r => {
-                Object.keys(data).forEach(field => {
-                    recordData.value[field].before = data[field];
-                    recordData.value[field].after = data[field];
+            return props.callback(result).then(r => {
+                Object.keys(result.data).forEach(field => {
+                    recordData.value[field].before = result.data[field];
+                    recordData.value[field].after = result.data[field];
                 });
                 
                 return r;

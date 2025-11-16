@@ -1,12 +1,16 @@
 import request from 'settings/axios/index.js';
 import vueRouter from 'settings/vue-router/index.js';
 import appStore from 'settings/pinia/store/app.js';
+import apiStore from 'settings/pinia/store/api.js';
 import {isDef, isObject} from 'main/utilities.js';
 
 export const logoutErrors = new Set(['AUTHORIZATION_IS_REQUIRED', 'AUTHORIZATION_UNDEFINED', 'AUTHORIZATION_IS_EXPIRED']);
 
 export function init() {
     const app = appStore();
+    const api = apiStore();
+
+    request.defaults.baseURL = api.baseURL;
     
     /**
      * @description Antes de cada solicitud

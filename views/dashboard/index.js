@@ -9,7 +9,7 @@ export const component = {
     template: /*html*/`
         <v-container fluid>
             <v-row>
-                Panel informativo
+                <v-btn variant="text" @click="test">Cerrar sesión</v-btn>
             </v-row>
         </v-container>
     `,
@@ -23,6 +23,9 @@ export const component = {
         /* Watch */
         
         /* Methods */
+        function test() {
+            app.logout();
+        }
         
         /* Ciclo de vida */
         onMounted(() => {
@@ -34,10 +37,11 @@ export const component = {
         /* Exponer estado */
         return {
             // Data
-
+            
             // Computed
 
             // Methods
+            test
         };
     }
 };

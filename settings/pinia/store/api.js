@@ -1,9 +1,9 @@
 import {ref,watch} from 'vue';
 import {defineStore} from 'pinia';
 import request from 'settings/axios/index.js';
-import {setStorage,getStorage,hasStorage,removeStorage,isObject} from 'main/utilities.js';
+import {setStorage,getStorage,isDef} from 'main/utilities.js';
 
-export const ksApiUrlBase = 'api-url-base';
+export const ksApiBaseUrl = 'api-url-base';
 export const ksTenantId = 'api-tenant-id';
 export const ksBranchId = 'api-branch-id';
 
@@ -12,17 +12,17 @@ export const apiStore  = defineStore('api', () => {
     /**
      * State
      */
-    const urlBase = ref(getStorage('local', ksApiUrlBase) ?? null);
+    const baseURL = ref(getStorage('local', ksApiBaseUrl) ?? null);
     const tenantId = ref(getStorage('local', ksTenantId) ?? null);
     const branchId = ref(getStorage('local', ksBranchId) ?? null);
 
     /**
      * Watcheres
      */
-    watch(urlBase, (value) => {
-        setStorage('local', ksApiUrlBase, value);
-        
-        console.log(request);
+    watch(baseURL, (value) => {
+        setStorage('local', ksApiBaseUrl, value);
+
+        request.defaults.baseURL = value;
     });
     watch(tenantId, (value) => {
         setStorage('local', ksTenantId, value);
@@ -32,7 +32,7 @@ export const apiStore  = defineStore('api', () => {
     });
 
     return {
-        urlBase,tenantId,branchId
+        baseURL,tenantId,branchId
     };
 });
 

@@ -1,9 +1,11 @@
-import {ref,computed} from 'vue';
+import {ref,computed,nextTick} from 'vue';
 import {defineStore} from 'pinia';
+import request from 'settings/axios/index.js';
 import {setStorage,getStorage,hasStorage,removeStorage,isObject} from 'main/utilities.js';
 
 export const ksSessionToken = 'app-session-token';
 export const ksSessionExpires = 'app-session-expires';
+export const ksUserType = 'app-user-type';
 export const appStore  = defineStore('app', () => {
     /**
      * State
@@ -23,10 +25,9 @@ export const appStore  = defineStore('app', () => {
     const bar = ref({render: false, height: 64});
     const sidebar = ref({render: false, show: false});
     const snackbar = ref({show: false, text: null, timeout: null, icon: {name: null, color: null}, template: null, params: null});
-    const user = ref({type: null, id: null, firstName: null, lastName: null, sex: null,});
+    const user = ref({id: null, firstName: null, lastName: null, sex: null,});
     const userRoles = ref([]);
     const userPermissions = ref(new Map());
-    
     
     /**
      * Getters
@@ -191,83 +192,53 @@ export const appStore  = defineStore('app', () => {
             return false;
         }
     }
-
-    /**
-     * @description Obtener token de la sesión actual
-     * 
-     * @return {string}
-     */
+    
     function getSessionToken() {
         return getStorage('local', ksSessionToken);
     }
-
-    /**
-     * @description Establecer token de autorización
-     * 
-     * @param {string} value - Valor a establecer
-     * 
-     * @return {undefined}
-     */
+    
     function setSessionToken(value) {
         setStorage('local', ksSessionToken, value);
     };
-
-    /**
-     * @description Remover token de autorización
-     * 
-     * @return {undefined}
-     */
+    
     function removeSessionToken() {
         removeStorage('local', ksSessionToken);
     };
     
-    /**
-     * @description Validar existencia del token de autorización
-     * 
-     * @return {boolean}
-     * 
-     */
     function hasSessionToken() {
         return hasStorage('local', ksSessionToken);
     }
     
-    /**
-     * @description Obtener vencimiento de la sesión actual
-     * 
-     * @return {string}
-     */
     function getSessionExpires() {
         return getStorage('local', ksSessionExpires);
     }
-
-    /**
-     * @description Establecer vencimiento de autorización
-     * 
-     * @param {string} value - Valor a establecer
-     * 
-     * @return {undefined}
-     */
+    
     function setSessionExpires(value) {
         setStorage('local', ksSessionExpires, value);
     };
-
-    /**
-     * @description Remover vencimiento de autorización
-     * 
-     * @return {undefined}
-     */
+    
     function removeSessionExpires() {
         removeStorage('local', ksSessionExpires);
     };
 
-    /**
-     * @description Validar existencia del vencimiento de autorización
-     * 
-     * @return {boolean}
-     * 
-     */
     function hasSessionExpires() {
         return hasStorage('local', ksSessionExpires);
+    }
+
+    function getUserType() {
+        return getStorage('local', ksUserType);
+    }
+
+    function setUserType(value) {
+        return setStorage('local', ksUserType, value);
+    }
+
+    function removeUserType() {
+        removeStorage('local', ksUserType);
+    }
+
+    function hasUserType() {
+        return hasStorage('local', ksUserType);
     }
 
     /**
@@ -275,8 +246,40 @@ export const appStore  = defineStore('app', () => {
      * 
      * @returns {promise}
      */
-    function getUserDataFromServer() {
-        return Promise.reject('Undefined callback');
+    function getUserDataFromServer(params) {
+        let userType = (getUserType() === '2') ? 'client' : 'user';
+        if (!isObject(params)) {
+            params = {
+                person: 'true',
+                role: 'true',
+                permission: 'true'
+            };
+        }
+        
+        return request({
+            url: '/auth/' + userType,
+            method: 'get',
+            params
+        }).then(r => {
+            // Almacenar datos
+            if (userType == 'client') {
+                alert('todo: Implementa esta monda (almacenamiento de la data del cliente)');
+            }
+            else {
+                if ('person' in r.data.data) {
+                    user.value.id = r.data.data.person.user_id;
+                    user.value.firstName = r.data.data.person.first_name;
+                    user.value.lastName = r.data.data.person.last_name;
+                    user.value.sex = r.data.data.person.sex;
+                }
+            }
+            if ('role' in r.data.data) {
+                userRoles.value = [...r.data.data.role];
+            }
+            if ('permission' in r.data.data) {
+                setUserPermissions(r.data.data.permission);
+            }
+        });
     }
 
     /**
@@ -285,7 +288,18 @@ export const appStore  = defineStore('app', () => {
      * @return {Promise}
      */
     function logout() {
-        return Promise.reject('Undefined callback');
+        let userType = (getUserType() === '2') ? 'client' : 'user';
+
+        return request({
+            url: '/auth/' + userType,
+            method: 'delete'
+        }).then(r => {
+            nextTick(() => {
+                reset();
+            });
+
+            return r;
+        });
     }
 
     /**
@@ -307,6 +321,7 @@ export const appStore  = defineStore('app', () => {
                 result.set(i, {
                     id: values[i].id,
                     module_id: values[i].module_id,
+                    module_is_developing: (values[i].module_is_developing == '1'),
                     level: values[i].level,
                     create: values[i].feature.includes('0'),
                     read: values[i].feature.includes('1'),
@@ -328,6 +343,8 @@ export const appStore  = defineStore('app', () => {
      */
     function reset() {
         removeSessionToken();
+        removeSessionExpires();
+        removeUserType();
         /* Usuario */
         for(let key in user.value) {
             user.value[key] = null;
@@ -341,7 +358,7 @@ export const appStore  = defineStore('app', () => {
     return {
         initialized,name,status,statusOptions,bar,sidebar,snackbar,user,userRoles,userPermissions,
         hasUser,hasUserPermissions,userShortName,userNameInitials,
-        setStatus,setTitle,setSnackbar,getSessionToken,setSessionToken,removeSessionToken,hasSessionToken,getSessionExpires,setSessionExpires,removeSessionExpires,hasSessionExpires,getUserDataFromServer,logout,setUserPermissions,reset
+        setStatus,setTitle,setSnackbar,getSessionToken,setSessionToken,removeSessionToken,hasSessionToken,getSessionExpires,setSessionExpires,removeSessionExpires,hasSessionExpires, getUserType,setUserType,removeUserType,hasUserType,getUserDataFromServer,logout,setUserPermissions,reset
     };
 });
 

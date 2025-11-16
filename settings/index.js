@@ -40,4 +40,7 @@ const vueApp = createApp({
     }
 }).use(vuetify).use(vueRouter).use(pinia);
 
+
+vueApp.component('l-form', defineAsyncComponent(() => import('components/form/index.js')));
+
 vueApp.mount('#app');
