@@ -13,6 +13,7 @@ import overlayLoader from 'sections/overlay-loader/index.js';
 /*import navigationDrawer from 'sections/navigation-drawer/index.js';
 import bar from 'sections/bar/index.js';*/
 import snackbar from 'sections/snackbar/index.js';
+import dialogExtendSession from 'sections/dialog/extend-session.js';
 
 
 /* Inicializar */
@@ -21,7 +22,8 @@ const vueApp = createApp({
         'overlay-loader': overlayLoader,
         /*'navigation-drawer': navigationDrawer,
         'bar': bar,*/
-        'snackbar': snackbar
+        'snackbar': snackbar,
+        'dialog-extend-session': dialogExtendSession
     },
     data: () => ({}),
     computed: {},
@@ -41,6 +43,7 @@ const vueApp = createApp({
 }).use(vuetify).use(vueRouter).use(pinia);
 
 
-vueApp.component('l-form', defineAsyncComponent(() => import('components/form/index.js')));
+vueApp.component('d-form', defineAsyncComponent(() => import('components/form/index.js')));
+vueApp.component('d-dialog', defineAsyncComponent(() => import('sections/dialog/index.js')));
 
 vueApp.mount('#app');

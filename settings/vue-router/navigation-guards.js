@@ -24,7 +24,7 @@ export function init() {
             });
         }
         
-        if(!app.hasUser && app.hasSessionToken()) {
+        if(!app.hasUser && app.hasSessionToken() && app.getSessionExpiresDiff() > 0) {
             await app.getUserDataFromServer().catch(e => null);
         }
 

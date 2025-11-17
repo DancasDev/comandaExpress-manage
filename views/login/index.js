@@ -41,7 +41,7 @@ export const component = {
                                         <p>Inicia sesión con tu cuenta para continuar</p>
                                     </v-col>
                                     <v-col cols="12" md="6" class="mt-5 mt-md-10">
-                                        <l-form
+                                        <d-form
                                             v-model:loading="loading"
                                             ref="form"
                                             type="create"
@@ -56,7 +56,7 @@ export const component = {
                                                     @click:appendInner="passwordShow = !passwordShow">
                                                 </v-text-field>
                                             </template>
-                                        </l-form>
+                                        </d-form>
                                         <div class="d-flex mt-10 justify-center">
                                             <v-btn @click="submit" color="primary" :disabled="submitDisabled">
                                                 Iniciar sesión

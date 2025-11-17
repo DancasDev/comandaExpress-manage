@@ -242,6 +242,27 @@ export const appStore  = defineStore('app', () => {
     }
 
     /**
+     * @description Obtener tiempo restante de una sesión
+     * 
+     * @returns {number}
+     */
+    function getSessionExpiresDiff() {
+        let result = 0;
+        let dateCurrent = new Date();
+        if (!hasSessionExpires()) {
+            return result;
+        }
+        
+
+        result = (new Date(Number(getSessionExpires()))) - dateCurrent;
+        if (isNaN(result)) {
+            result = 0;
+        }
+
+        return result;
+    }
+
+    /**
      * @description Obtener datos del usuario
      * 
      * @returns {promise}
@@ -303,6 +324,25 @@ export const appStore  = defineStore('app', () => {
     }
 
     /**
+     * @description Cerrar sesión
+     * 
+     * @return {Promise}
+     */
+    function refreshSession() {
+        let userType = (getUserType() === '2') ? 'client' : 'user';
+
+        return request({
+            url: '/auth/' + userType,
+            method: 'put'
+        }).then(r => {
+            setSessionToken(r.data.data.token);
+            setSessionExpires(new Date(r.data.data.expires_at * 1000).getTime());
+
+            return r;
+        });
+    }
+
+    /**
      * @description Almacenar accesos del usuario
      * 
      * @param {Object} values - access lista
@@ -358,7 +398,7 @@ export const appStore  = defineStore('app', () => {
     return {
         initialized,name,status,statusOptions,bar,sidebar,snackbar,user,userRoles,userPermissions,
         hasUser,hasUserPermissions,userShortName,userNameInitials,
-        setStatus,setTitle,setSnackbar,getSessionToken,setSessionToken,removeSessionToken,hasSessionToken,getSessionExpires,setSessionExpires,removeSessionExpires,hasSessionExpires, getUserType,setUserType,removeUserType,hasUserType,getUserDataFromServer,logout,setUserPermissions,reset
+        setStatus,setTitle,setSnackbar,getSessionToken,setSessionToken,removeSessionToken,hasSessionToken,getSessionExpires,setSessionExpires,removeSessionExpires,hasSessionExpires, getUserType,setUserType,removeUserType,hasUserType,getSessionExpiresDiff,getUserDataFromServer,logout,refreshSession,setUserPermissions,reset
     };
 });
 

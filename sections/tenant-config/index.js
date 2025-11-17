@@ -9,64 +9,50 @@ export const component = {
     emits: [],
     props: {},
     template: /*html*/`
-        <v-dialog v-model="dialogShow" max-width="500">
-            <template v-slot:activator="{ props: dialogActivatorProps }">
-                <v-tooltip :text="title">
-                    <template v-slot:activator="{ props: tooltipActivatorProps }">
-                        <v-btn
-                            v-bind="{...dialogActivatorProps, ...tooltipActivatorProps}"
-                            icon="mdi-office-building-cog"
-                            variant="text"
-                        ></v-btn>
-                    </template>
-                </v-tooltip>
-            </template>
-            <template v-slot:default="{ isActive }">
-                <v-card
-                    :disabled="formLoading"
-                    :loading="formLoading">
-                    <template v-slot:loader="{ isActive }">
-                        <v-progress-linear
-                            :active="isActive"
-                            color="primary"
-                            height="4"
-                            indeterminate
-                        ></v-progress-linear>
-                    </template>
-                    <v-card-title class="d-flex">
-                        <span class="my-auto">{{title}}</span>
-                        <v-spacer></v-spacer>
-                        <v-menu>
-                            <template v-slot:activator="{ props: menuActivadorProps }">
-                                <v-btn variant="text" icon="mdi-dots-vertical" v-bind="menuActivadorProps">
-                                </v-btn>
-                            </template>
-                            <v-list class="py-0" density="compact" slim>
-                                <v-list-item prepend-icon="mdi-file-upload-outline" title="Subir configuración" @click="uploadFileClick"></v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-card-title>
-                    <v-card-text>
-                        <l-form
-                            ref="form"
-                            v-model:loading="formLoading"
-                            type="formType"
-                            :items="formItems"
-                            :callback="formCallback"
-                            :callback-read="formCallbackRead">
-                        </l-form>
-                        <!--Input-->
-                        <input type="file" ref="uploadFileInput" class="d-none" accept="application/json" @change="uploadFileEvent">
-                    </v-card-text>
-                    <v-divider></v-divider>
-                    <v-card-actions>
-                        <v-btn text="Cerrar" @click="isActive.value = false"></v-btn>
-                        <v-spacer></v-spacer>
-                        <v-btn text="Guardar" color="primary" :disabled="formDisabled" @click="form.submit()"></v-btn>
-                    </v-card-actions>
-                </v-card>
-            </template>
-        </v-dialog>
+        <div>
+            <v-tooltip :text="title">
+                <template v-slot:activator="{ props }">
+                    <v-btn
+                        v-bind="props"
+                        @click="dialogShow = true"
+                        icon="mdi-office-building-cog"
+                        variant="text"
+                    ></v-btn>        
+                </template>
+            </v-tooltip>
+            <!--Dialogo-->
+            <d-dialog
+                v-model="dialogShow"
+                v-model:loading="formLoading"
+                max-width="600px"
+                :title-text="title"
+                title-action-show
+                footer-btn-accept-text="Actualizar"
+                :footer-btn-accept-callback="formSubmit"
+                :footer-btn-accept-disabled="formDisabled">
+                <template v-slot:title-action>
+                    <v-menu>
+                        <template v-slot:activator="{ props }">
+                            <v-btn variant="text" icon="mdi-dots-vertical" v-bind="props">
+                            </v-btn>
+                        </template>
+                        <v-list class="py-0" density="compact" slim>
+                            <v-list-item prepend-icon="mdi-file-upload-outline" title="Subir configuración" @click="uploadFileClick"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                    <input type="file" ref="uploadFileInput" class="d-none" accept="application/json" @change="uploadFileEvent">
+                </template>
+                
+                <d-form
+                    ref="form"
+                    v-model:loading="formLoading"
+                    type="update"
+                    :items="formItems"
+                    :callback="formCallback"
+                    :callback-read="formCallbackRead">
+                </d-form>
+            </d-dialog>
+        </div>
     `,
     setup(props, { emit }) {
         let app = appStore();
@@ -74,11 +60,10 @@ export const component = {
         let rules = rulesStore();
         
         /* Data */
-        const title = ref('Configuración de conexión');
+        const title = ref('Configuracióssn de conexión');
         const dialogShow = ref(false);
         const form = ref(null);
         const formLoading = ref(false);
-        const formType = ref('update');
         const formItems = ref([
             {
                 isTitle: true,
@@ -137,6 +122,10 @@ export const component = {
         });
         
         /* Methods */
+        function formSubmit() {
+            form.value.submit();
+        }
+
         function formCallback({affected, message, data}) {
             if (affected) {
                 for(let field in data) {
@@ -171,7 +160,6 @@ export const component = {
         }
 
         function uploadFileClick() {
-            console.log(uploadFileInput.value)
             uploadFileInput.value.click();
         }
 
@@ -214,14 +202,14 @@ export const component = {
         /* Exponer estado */
         return {
             // Data
-            title, dialogShow, form, formType, formLoading, formItems,
+            title, dialogShow, form, formLoading, formItems,
             uploadFileInput,
 
             // Computed
             formDisabled,
 
             // Methods
-            formCallback, formCallbackRead,
+            formSubmit, formCallback, formCallbackRead,
             uploadFileClick, uploadFileEvent
         };
     }
