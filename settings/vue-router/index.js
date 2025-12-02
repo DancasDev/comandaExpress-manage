@@ -15,11 +15,28 @@ export const routes =  [
 		name: 'login',
 		component: () => import('views/login/index.js'),
 		meta: {
+            title: 'Iniciar sesión',
 			requiresLogout: true,
 			renderSidebar: false,
 			renderBar: false,
         }
-	}
+	},
+    {
+		path: '/menu/categories',
+		name: 'menu_categories',
+		component: () => import('views/menu/categories/index.js'),
+		meta: {
+            title: 'Menú / Categorías'
+        }
+	},
+    {
+		path: '/menu/products',
+		name: 'menu_products',
+		component: () => import('views/menu/products/index.js'),
+		meta: {
+            title: 'Menú / Productos'
+        }
+	},
 ];
 
 /**

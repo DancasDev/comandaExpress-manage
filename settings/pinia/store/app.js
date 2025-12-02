@@ -129,7 +129,7 @@ export const appStore  = defineStore('app', () => {
     function setTitle(value) {
         let result;
         // Establecer titulo
-        result = (typeof value === 'string') ? (value + ' | ' +  name.short) : (name.full);
+        result = (typeof value === 'string') ? (value + ' - ' +  name.value.short) : (name.value.full);
         
         // Ventana
         document.title = result;

@@ -85,6 +85,7 @@ export function init() {
     vueRouter.afterEach(async function (to) {
         app.sidebar.render = !isDef(to.meta.renderSidebar) ? true : to.meta.renderSidebar;
         app.bar.render = !isDef(to.meta.renderBar) ? true : to.meta.renderBar;
+        app.setTitle(to.meta.title ?? 'Cargando...');
     });
 }
 

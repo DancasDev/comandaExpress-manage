@@ -2,7 +2,7 @@ import { ref, computed, watch, nextTick, onMounted, onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import appStore from 'store/app.js';
 import rulesStore from 'store/rules.js';
-import request from 'settings/axios/index.js';
+import request from 'request/index.js';
 import {isDef} from 'main/utilities.js';
 
 import tenantConfig from 'sections/tenant-config/index.js';
@@ -72,9 +72,9 @@ export const component = {
         </v-container>
     `,
     setup(props, { emit }) {
-        let app = appStore();
-        let rules = rulesStore();
-        let router = useRouter();
+        const app = appStore();
+        const rules = rulesStore();
+        const router = useRouter();
 
         /* Data */
         const loading = ref(false);

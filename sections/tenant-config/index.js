@@ -55,9 +55,9 @@ export const component = {
         </div>
     `,
     setup(props, { emit }) {
-        let app = appStore();
-        let api = apiStore();
-        let rules = rulesStore();
+        const app = appStore();
+        const api = apiStore();
+        const rules = rulesStore();
         
         /* Data */
         const title = ref('Configuracióssn de conexión');

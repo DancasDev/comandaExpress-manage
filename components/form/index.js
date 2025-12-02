@@ -1,6 +1,5 @@
 import { ref, computed, watch, nextTick, onMounted, defineAsyncComponent } from 'vue';
 import appStore from 'store/app.js';
-import { isDef, isObject } from 'main/utilities.js';
 import formSkeleton from 'components/form/skeleton.js';
 
 export const component = {
@@ -52,41 +51,57 @@ export const component = {
                             'update:focused': v => v ? (recordData[item.key].error = '') : null
                         }
                     }">
-                    <template v-if="props.type == 'textareas'">
-                        <v-textarea
-                            v-model="recordData[item.key].after"
-                            v-bind="{...props, type: 'text'}"
-                            v-on="on"
-                            :error-messages="recordData[item.key].error"
-                            @update:focused="v => v ? (recordData[item.key].error = '') : null">
-                        </v-textarea>
+                    <template v-if="type == 'read'">
+                        <template v-if="props.type == 'textareas'">
+                            <d-read-textareas
+                                v-bind="{...props, value: recordData[item.key].after}"
+                                v-on="on">
+                            </d-read-textareas>
+                        </template>
+                        <template v-else>
+                            <d-read-text-field 
+                                v-bind="{...props, value: recordData[item.key].after}"
+                                v-on="on">
+                            </d-read-text-field>
+                        </template>
                     </template>
-                    <template v-else-if="props.type == 'select'">
-                        <v-select
-                            v-model="recordData[item.key].after"
-                            v-bind="{...props, type: 'text'}"
-                            v-on="on"
-                            :error-messages="recordData[item.key].error"
-                            @update:focused="v => v ? (recordData[item.key].error = '') : null">
-                        </v-select>
-                    </template>
-                    <!--template v-else-if="props.type == 'data-autocomplete'">
-                        <data-autocomplete
-                            v-model="recordData[item.key].after"
-                            v-bind="{...props, type: 'text'}"
-                            v-on="on"
-                            :error-messages="recordData[item.key].error"
-                            @update:focused="v => v ? (recordData[item.key].error = '') : null">
-                        </data-autocomplete>
-                    </template-->
                     <template v-else>
-                        <v-text-field
-                            v-model="recordData[item.key].after"
-                            v-bind="{...props}"
-                            v-on="on"
-                            :error-messages="recordData[item.key].error"
-                            @update:focused="v => v ? (recordData[item.key].error = '') : null">
-                        </v-text-field>
+                        <template v-if="props.type == 'textareas'">
+                            <v-textarea
+                                v-model="recordData[item.key].after"
+                                v-bind="{...props, type: 'text'}"
+                                v-on="on"
+                                :error-messages="recordData[item.key].error"
+                                @update:focused="v => v ? (recordData[item.key].error = '') : null">
+                            </v-textarea>
+                        </template>
+                        <template v-else-if="props.type == 'select'">
+                            <v-select
+                                v-model="recordData[item.key].after"
+                                v-bind="{...props, type: 'text'}"
+                                v-on="on"
+                                :error-messages="recordData[item.key].error"
+                                @update:focused="v => v ? (recordData[item.key].error = '') : null">
+                            </v-select>
+                        </template>
+                        <!--template v-else-if="props.type == 'data-autocomplete'">
+                            <data-autocomplete
+                                v-model="recordData[item.key].after"
+                                v-bind="{...props, type: 'text'}"
+                                v-on="on"
+                                :error-messages="recordData[item.key].error"
+                                @update:focused="v => v ? (recordData[item.key].error = '') : null">
+                            </data-autocomplete>
+                        </template-->
+                        <template v-else>
+                            <v-text-field
+                                v-model="recordData[item.key].after"
+                                v-bind="{...props}"
+                                v-on="on"
+                                :error-messages="recordData[item.key].error"
+                                @update:focused="v => v ? (recordData[item.key].error = '') : null">
+                            </v-text-field>
+                        </template>
                     </template>
                 </slot>
             </template>
@@ -129,17 +144,41 @@ export const component = {
          * @return {undefined}
          */
         function recordDataBuild() {
-            let result = {};
+            let result = {}, defaultValue = null;
 
             fieldKeys.value.forEach(field => {
+                defaultValue = formSkeleton.value?.itemsFormatted?.input?.[field]?.props?.value ?? null;
+                
                 result[field] = {
-                    before: null,
-                    after: null,
+                    before: defaultValue,
+                    after: defaultValue,
                     error: ''
                 };
             });
                 
             recordData.value = {...result};
+        }
+        
+        /**
+         * @description Formatear valores de recordData
+         * 
+         * @param {array} data
+         * 
+         * @return {undefined}
+         */
+        function recordDataFormat(data) {
+            let value, formatFunction;
+
+            fieldKeys.value.forEach(field => {
+                value = data[field] ?? null;
+                formatFunction = formSkeleton.value?.itemsFormatted?.input?.[field]?.format ?? null;
+                if (typeof formatFunction == 'function') {
+                    value = formatFunction(data, value);
+                }
+                
+                recordData.value[field].before = value;
+                recordData.value[field].after = value;
+            });
         }
 
         /**
@@ -154,13 +193,8 @@ export const component = {
             
             // Realizar solicitud
             return props.callbackRead([...fieldKeys.value]).then(r => {
-                let value;
-                fieldKeys.value.forEach(field => {
-                    value = r[field] ?? r.data?.[field] ?? r.data?.data?.[field] ?? null;
-                    
-                    recordData.value[field].before = value;
-                    recordData.value[field].after = value;
-                });
+                let data = r?.data?.data ?? r?.data ?? r;
+                recordDataFormat(data);
 
                 return r;
             }).finally(() => {
@@ -212,10 +246,15 @@ export const component = {
             
             // Realizar solicitud
             return props.callback(result).then(r => {
-                Object.keys(result.data).forEach(field => {
-                    recordData.value[field].before = result.data[field];
-                    recordData.value[field].after = result.data[field];
-                });
+                if (props.type == 'create') {
+                    recordDataBuild();
+                }
+                else {                
+                    Object.keys(result.data).forEach(field => {
+                        recordData.value[field].before = result.data[field];
+                        recordData.value[field].after = result.data[field];
+                    });
+                }
                 
                 return r;
             }).catch(e => {
@@ -243,6 +282,15 @@ export const component = {
         }
 
         /**
+         * @description Reiniciar formulario
+         * 
+         */
+        function reset() {
+            formSkeleton.value.reset();
+        }
+
+
+        /**
          * @description Validar formulario
          * 
          * @return {promise}
@@ -265,7 +313,7 @@ export const component = {
             loadingValue, itemsOnlyInput, isValid,
 
             // Methods
-            getDataFromServer, submit, callback, restore, validate
+            getDataFromServer, submit, callback, restore, reset, validate
         };
     }
 };

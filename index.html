@@ -14,9 +14,11 @@
 <body>
     <div id="app">
         <v-app app>
-            <overlay-loader></overlay-loader> 
+            <overlay-loader></overlay-loader>
+            <navigation-drawer v-if="sidebarRender" app></navigation-drawer>
+            <bar v-if="barRender" app scroll-behavior="elevate" scroll-target="#sheetScrolling"></bar>
             <v-main scrollable app>
-                <v-sheet id="sheetScrolling" color="transparent" class="overflow-y-auto">
+                <v-sheet id="sheetScrolling" color="transparent" class="overflow-y-auto" :height="viewHeight">
                     <router-view></router-view>
                 </v-sheet>
             </v-main>

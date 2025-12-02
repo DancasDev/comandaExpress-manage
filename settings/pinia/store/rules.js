@@ -171,10 +171,12 @@ export const rulesStore  = defineStore('rules', () => {
      */
     function numberOnly(value) {
         let response = true;
-        if (typeof value == 'string' && value.length > 0 && !/^[0-9]+$/.test(value)) {
-            response = 'Este campo solo permite números';
+        if (typeof value === 'string' && value.length > 0) {
+            let numValue = Number(value);
+            if (isNaN(numValue)) {
+                response = 'Este campo solo permite números válidos';
+            }
         }
-    
         return response;
     }
 

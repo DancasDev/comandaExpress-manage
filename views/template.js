@@ -8,14 +8,19 @@ export const component = {
     template: /*html*/`
         <v-container fluid>
             <v-row>
-                prueba
+                <v-col class="pb-0" cols="12">
+                    <d-breadcrumbs :items="breadcrumbsItems"></d-breadcrumbs>
+                </v-col>
             </v-row>
         </v-container>
     `,
     setup(props, { emit }) {
-        let app = appStore();
+        const app = appStore();
 
         /* Data */
+        const breadcrumbsItems = ref([
+            {title: 'title', disabled: false, to: '/'}
+        ]);
 
         /* Computed */
 
@@ -33,6 +38,7 @@ export const component = {
         /* Exponer estado */
         return {
             // Data
+            breadcrumbsItems,
 
             // Computed
 

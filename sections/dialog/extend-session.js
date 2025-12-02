@@ -21,8 +21,8 @@ export const component = {
         </d-dialog>
     `,
     setup(props, { emit }) {
-        let app = appStore();
-        let router = useRouter();
+        const app = appStore();
+        const router = useRouter();
 
 
         /* Data */

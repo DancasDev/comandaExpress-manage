@@ -9,23 +9,28 @@ export const component = {
     template: /*html*/`
         <v-container fluid>
             <v-row>
-                <v-btn variant="text" @click="test">Cerrar sesión</v-btn>
+                <v-col class="pb-0" cols="12">
+                    <d-breadcrumbs :items="breadcrumbsItems"></d-breadcrumbs>
+                </v-col>
+                <v-col cols="12">
+                    <d-status-development></d-status-development>
+                </v-col>
             </v-row>
         </v-container>
     `,
     setup(props, { emit }) {
-        let app = appStore();
+        const app = appStore();
 
         /* Data */
+        const breadcrumbsItems = ref([
+            {title: 'Dashboard', disabled: false, to: '/'}
+        ]);
 
         /* Computed */
 
         /* Watch */
         
         /* Methods */
-        function test() {
-            app.logout();
-        }
         
         /* Ciclo de vida */
         onMounted(() => {
@@ -37,11 +42,12 @@ export const component = {
         /* Exponer estado */
         return {
             // Data
+            breadcrumbsItems,
             
             // Computed
 
             // Methods
-            test
+            
         };
     }
 };

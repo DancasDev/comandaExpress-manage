@@ -6,7 +6,7 @@ export const component = {
     props: {
         modelValue: {
             type: Boolean,
-            default: true
+            default: false
         },
         loading: {
             type: Boolean,
@@ -140,7 +140,7 @@ export const component = {
                 </v-card-text>
                 <!--Footer-->
                 <template v-if="footerShow">
-                    <v-divider></v-divider>
+                    <v-divider class="border-opacity-25"></v-divider>
                     <v-card-actions>
                         <slot name="footer">
                             <slot v-if="footerBtnCancelShow" name="footer-btn-cancel">
@@ -148,7 +148,7 @@ export const component = {
                             </slot>
                             <v-spacer></v-spacer>
                             <slot v-if="footerBtnAcceptShow" name="footer-btn-accept">
-                                <v-btn variant="text" :color="footerBtnAcceptColor" @click="acceptCallback" :disabled="footerBtnAcceptDisabled">{{footerBtnAcceptText}}</v-btn>
+                                <v-btn variant="elevated":color="footerBtnAcceptColor" @click="acceptCallback" :disabled="footerBtnAcceptDisabled">{{footerBtnAcceptText}}</v-btn>
                             </slot>
                         </slot>
                     </v-card-actions>
@@ -163,15 +163,11 @@ export const component = {
 
         /* Computed */
         const value = computed({
-            // getter
             get() {
                 return valueCache.value;
             },
-            // setter
             set(newValue) {
-                // almacenar cache 
                 valueCache.value = newValue;
-                // Emitir
                 emit('update:modelValue', newValue);
             }
         });

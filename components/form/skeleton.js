@@ -100,19 +100,19 @@ export const component = {
                 }
                 else {
                     item.type = 'input';
+                    item.format = props.items[i].format ?? null;
                     item.slotName = 'item.' + item.key;
                     item.colProps = {...(props.inputCols ?? {}), ...props.items[i].colProps};
                     item.on = props.items[i].on ?? {};
-                    item.defaultValue = props.items[i].defaultValue ?? null;
 
                     // Crea una copia de las props originales, luego elimina las que ya se separaron
                     item.props = {...props.items[i]};
 
                     // Depurar/eliminar propiedades que no deben pasarse como props directas al input
                     delete item.props.isTitle;
+                    delete item.props.format;
                     delete item.props.slotName;
                     delete item.props.colProps;
-                    delete item.props.defaultValue;
                     delete item.props.on;
                 }
                 
@@ -143,6 +143,9 @@ export const component = {
         });
 
         /* Watch */
+        watch(() => props.loading, value => {
+            loadingCache.value = value;
+        });
         
         /* Methods */
         /**
